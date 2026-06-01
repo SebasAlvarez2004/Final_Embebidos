@@ -71,8 +71,11 @@ void mcp4132_set_wiper(uint16_t addr, uint8_t* data){
 void mcp4132_set_cutoff_frequency(uint16_t cutoff_freq){
     uint8_t data = (cutoff_freq >> 8) & 0xFF;
 
+    const float c = 10e-9; //10nf
+    const float pi = 3.1415;
+    float Rwb = 1/(2*pi*cutoff_freq*c);
     //Aqui es poner las ecuaciones de frecuencia de corte para obtener el valor de la resistencia en digital (9-128) y enviarlo al potenciométro.
-    
+    int N = (Rwb-75)*128/(10e3);
     mcp4132_set_wiper(0x00, &data);
 
 }
