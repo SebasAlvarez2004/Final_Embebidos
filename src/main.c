@@ -27,7 +27,7 @@ void mcp4132_write_register(uint8_t reg, uint8_t addr){
         .length = 8*2
         .tx_buffer = tx_data,
     }
-    spi_device_transmit(sensor_handle, &trans);
+    spi_device_transmit(sensor_handle, &trans); //Sensor handle se entiende como el mcp4132
 }
 spi_sensor_write_register(SENSOR_CONFIG, 0x00);
 
@@ -70,6 +70,23 @@ void mcp4132_set_wiper(uint16_t addr, uint8_t* data){
 
 void mcp4132_set_cutoff_frequency(uint16_t cutoff_freq){
     uint8_t data = (cutoff_freq >> 8) & 0xFF;
-    mcp4132_set_wiper(0x00, &data);
+
+    //Aqui es poner las ecuaciones de frecuencia de corte para obtener el valor de la resistencia en digital (9-128) y enviarlo al potenciométro.
     
+    mcp4132_set_wiper(0x00, &data);
+
+}
+
+void app_main(void){
+    spi_bus_init();
+    spi_device_handle_t sensor_handle;
+    spi_device_interface_config_t sensor_config = MCP4132;
+    spi_bus_add_device(SPI_HOST, &sensor_config, &sensor_handle);
+
+ 
+    mcp4132_write_register(SENSOR_CONFIG, 0x00); //Escribir
+
+    uint8_t config_value = mcp4132_read_register(SENSOR_CONFIG); //Leer
+
+    mcp4132_set_cutoff_frequency(1000);
 }
